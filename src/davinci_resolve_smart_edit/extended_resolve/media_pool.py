@@ -41,9 +41,13 @@ class MediaPool:
         if media_pool_items is None:
             return None
 
-        media_pool_item = next((item for item in media_pool_items if condition(item)), None)
+        for _item in media_pool_items:
+            item = MediaPoolItem(_item)
 
-        return MediaPoolItem(media_pool_item) if media_pool_item is not None else None
+            if condition(item):
+                return item
+
+        return None
 
     def move_items(self, items: Iterable[MediaPoolItem], target_folder: Folder):
         self._media_pool.MoveClips([item._item for item in items], target_folder._folder)

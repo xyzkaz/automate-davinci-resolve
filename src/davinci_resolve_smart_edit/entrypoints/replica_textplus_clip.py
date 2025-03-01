@@ -3,6 +3,7 @@ from pathlib import Path
 from tkinter import filedialog
 
 from ..extended_resolve import davinci_resolve_module
+from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..extended_resolve.constants import MediaPoolItemType
 from ..resolve_types import PyRemoteComposition
 from ..smart_edit.errors import UserError
@@ -11,11 +12,15 @@ from ..smart_edit.ui.loading_window import LoadingWindow
 from .script_utils import ScriptUtils
 
 
+def _is_textplus_item(item: MediaPoolItem):
+    return item.get_clip_type() == MediaPoolItemType.FUSION_TITLE
+
+
 def on_copy_style_for_all():  # TODO: preserve style on regeneration
     with LoadingWindow("ReplicaText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
-        media_pool_item = media_pool.find_selected_item(lambda item: item.GetClipProperty("Type") == MediaPoolItemType.FUSION_TITLE)
+        media_pool_item = media_pool.find_selected_item(_is_textplus_item)
 
         if media_pool_item is None:
             raise UserError("No Media Pool Text+ clip selected")
@@ -27,7 +32,7 @@ def on_copy_style_for_track(composition: PyRemoteComposition):
     with LoadingWindow("ReplicaText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
-        media_pool_item = media_pool.find_selected_item(lambda item: item.GetClipProperty("Type") == MediaPoolItemType.FUSION_TITLE)
+        media_pool_item = media_pool.find_selected_item(_is_textplus_item)
 
         if media_pool_item is None:
             raise UserError("No Media Pool Text+ clip selected")
@@ -40,7 +45,7 @@ def on_copy_style_for_clip(composition: PyRemoteComposition):
     with LoadingWindow("ReplicaText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
-        media_pool_item = media_pool.find_selected_item(lambda item: item.GetClipProperty("Type") == MediaPoolItemType.FUSION_TITLE)
+        media_pool_item = media_pool.find_selected_item(_is_textplus_item)
 
         if media_pool_item is None:
             raise UserError("No Media Pool Text+ clip selected")

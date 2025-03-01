@@ -1,6 +1,5 @@
 import itertools
 import traceback
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
@@ -13,11 +12,15 @@ from ..extended_resolve.timecode import Timecode
 from ..extended_resolve.timeline import Timeline
 from ..extended_resolve.timeline_item import TimelineItem
 from ..extended_resolve.track import TrackHandle
+from ..extended_resolve.textplus import TextPlusSettings
 from .errors import UserError
 from .smart_edit_bin import SmartEditBin
 from .ui.loading_window import LoadingWindow
 from ..utils.math import FrameRange
 from .constants import GeneratedTrackName
+
+
+LineRange = tuple[int, int]
 
 
 class ReplicaTextPlus:
@@ -199,18 +202,65 @@ class ReplicaTextPlus:
 
     @classmethod
     def _copy_style_from_settings(cls, src_settings: dict, dst_items: Iterable[TimelineItem]):
-        new_settings = src_settings
+        new_settings = TextPlusSettings(src_settings)
 
         for dst_item in dst_items:
             dst_comp = dst_item._item.GetFusionCompByIndex(1)
             dst_tool = dst_comp.Template
-            old_settings = dst_comp.CopySettings(dst_tool)
+            old_settings = TextPlusSettings(dst_comp.CopySettings(dst_tool))
+            new_tool_settings = new_settings.get_textplus_tool()
+            old_tool_settings = old_settings.get_textplus_tool()
 
-            cls._find_text_input(new_settings)["Value"] = cls._find_text_input(old_settings)["Value"]
-            new_settings["Tools"]["Template"]["Inputs"]["GlobalOut"] = old_settings["Tools"]["Template"]["Inputs"]["GlobalOut"]
-            new_settings["Tools"]["Template"]["CustomData"] = old_settings["Tools"]["Template"]["CustomData"]
+            new_text = old_settings.get_text_input()._settings["Value"]
 
-            dst_tool.LoadSettings(new_settings)
+            new_settings.get_text_input()._settings["Value"] = new_text
+            new_tool_settings._settings["Inputs"]["GlobalOut"] = old_tool_settings._settings["Inputs"]["GlobalOut"]
+            new_tool_settings._settings["CustomData"] = old_tool_settings._settings["CustomData"]
+
+            character_level_settings = new_settings.find_character_level_styling()
+            if character_level_settings is not None:
+                new_style_array = cls._map_style_array_to_lines(character_level_settings.style_array, new_text)
+                character_level_settings.style_array = new_style_array
+
+            dst_tool.LoadSettings(new_settings._settings)
+
+    @classmethod
+    def _map_style_array_to_lines(cls, style_array: dict, text: str):
+        line_ranges: list[LineRange] = sorted({(value[2], value[3]) for value in style_array.values()})
+        new_line_ranges = cls._get_line_ranges(text, max_line_count=len(line_ranges))
+        new_style_array = {}
+
+        for i, value in list(style_array.items()):
+            line_range = (value[2], value[3])
+            line_index = line_ranges.index(line_range)
+
+            if line_index < len(new_line_ranges):
+                line_start, line_end = new_line_ranges[line_index]
+                value[2] = line_start
+                value[3] = line_end
+                new_style_array[len(new_style_array) + 1] = value
+            else:
+                style_array.pop(i)
+
+        return new_style_array
+
+    @classmethod
+    def _get_line_ranges(cls, text: str, max_line_count: int) -> list[LineRange]:
+        ranges = []
+        prev_end = -1
+
+        for i, line in enumerate(text.splitlines()[:max_line_count]):
+            start = prev_end + 1
+
+            if i < max_line_count - 1:
+                end = start + len(line)
+            else:
+                end = len(text)
+
+            ranges.append((start, end))
+            prev_end = end
+
+        return ranges
 
     @classmethod
     def _find_text_input(cls, textplus_settings):
