@@ -27,11 +27,11 @@ class SmartEditBin:
         media_pool = davinci_resolve_module.get_resolve().get_media_pool()
         folder = cls._get_or_import_bin(media_pool)
 
-        return folder.find_item(lambda item: item._item.GetClipProperty("Clip Name") == clip_name.value)
+        return folder.find_item(lambda item: item.get_clip_name() == clip_name.value)
 
     @classmethod
     def _find_smart_edit_folder(cls, media_pool: MediaPool):
-        return media_pool.find_folder(lambda folder_path: folder_path.depth == 2 and folder_path.bottom.GetName() == cls.FOLDER_NAME)
+        return media_pool.find_folder(lambda folder: folder.folder_path.depth == 2 and folder._folder.GetName() == cls.FOLDER_NAME)
 
     @classmethod
     def _get_or_import_bin(cls, media_pool: MediaPool):
@@ -41,7 +41,7 @@ class SmartEditBin:
             media_pool.import_bin(cls.BIN_PATH, media_pool.get_root_folder())
             return cls._find_smart_edit_folder(media_pool)
 
-        item_names = [item._item.GetClipProperty("Clip Name") for item in folder.iter_items()]
+        item_names = [item.get_clip_name() for item in folder.iter_items()]
         missing_clip_names = [clip_name.value for clip_name in cls.ClipName if clip_name.value not in item_names]
 
         if len(missing_clip_names) > 0:
@@ -49,7 +49,7 @@ class SmartEditBin:
             media_pool.import_bin(cls.BIN_PATH, tmp_folder)
             tmp_smart_edit_folder = Folder(tmp_folder._folder.GetSubFolderList()[0])
 
-            items = tmp_smart_edit_folder.find_items(lambda item: item._item.GetClipProperty("Clip Name") in missing_clip_names)
+            items = tmp_smart_edit_folder.find_items(lambda item: item.get_clip_name() in missing_clip_names)
             media_pool.move_items(items, folder)
             media_pool._media_pool.DeleteFolders([tmp_folder._folder])
 

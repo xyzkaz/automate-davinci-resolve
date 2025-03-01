@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Generator
 
 from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..resolve_types import PyRemoteFolder
@@ -16,44 +16,24 @@ class MediaPool:
         self._media_pool.SetCurrentFolder(parent_folder._folder)
         return self._media_pool.ImportFolderFromFile(str(file_path), "")
 
-    def __iter_folder_paths(self, folders: list[PyRemoteFolder]):
-        folder_path = FolderPath(folders)
+    def get_root_folder(self):
+        return Folder(folder_path=FolderPath([self._media_pool.GetRootFolder()]))
 
-        yield folder_path
+    def __iter_folders(self, current_folder: Folder):
+        yield current_folder
 
-        for subfolder in folder_path.bottom.GetSubFolderList():
-            yield from self.__iter_folder_paths([*folders, subfolder])
+        for subfolder in current_folder.iter_subfolders():
+            yield from self.__iter_folders(subfolder)
 
-    def _iter_folder_paths(self):
-        yield from self.__iter_folder_paths([self._media_pool.GetRootFolder()])
+    def iter_folders(self) -> Generator[Folder, None, None]:
+        yield from self.__iter_folders(self.get_root_folder())
 
     def find_folder(self, condition) -> Folder | None:
-        return next((Folder(p.bottom) for p in self._iter_folder_paths() if condition(p)), None)
-
-    def find_folders(self, condition) -> list[Folder]:
-        return [Folder(p.bottom) for p in self._iter_folder_paths() if condition(p)]
-
-    def _iter_items(self, folders):
-        current_folder = folders[-1]
-
-        for media_pool_item in current_folder.GetClipList():
-            yield media_pool_item, folders
-
-        for subfolder in current_folder.GetSubFolderList():
-            yield from self._iter_items(folders + [subfolder])
+        return next((folder for folder in self.iter_folders() if condition(folder)), None)
 
     def iter_items(self):
-        yield from self._iter_items([self._media_pool.GetRootFolder()])
-
-    def find_item(self, condition):
-        for item, folders in self.iter_items():
-            if condition(item, folders):
-                return item
-
-        return None
-
-    def find_items_with_folders(self, condition):
-        return [(item, folders) for item, folders in self.iter_items() if condition(item)]
+        for folder in self.iter_folders():
+            yield from folder.iter_items()
 
     def find_selected_item(self, condition):
         media_pool_items = self._media_pool.GetSelectedClips()

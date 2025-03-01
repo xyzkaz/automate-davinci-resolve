@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import NamedTuple
 
 from ..extended_resolve.track import TrackHandle
+from ..extended_resolve.constants import MediaPoolItemType
 from ..resolve_types import PyRemoteResolve
 from .media_pool import MediaPool
 from .media_pool_item import MediaPoolItem
@@ -15,6 +16,7 @@ class MediaPoolItemInsertInfo(NamedTuple):
     start_frame: int
     end_frame: int | None = None
     frames: int | None = None
+    source_start_frame: float = 0.0
     track_handle: TrackHandle | None = None
 
 
@@ -42,7 +44,7 @@ class Resolve:
         timecode = timeline.get_current_timecode()
         start_frame = start_frame or timecode.get_frame(True)
 
-        item_fps = media_pool_item._item.GetClipProperty()["FPS"]
+        item_fps = media_pool_item.get_frame_rate()
         timeline_fps = timeline.get_frame_rate()
         min_frames = max(TimecodeUtils.timedelta_to_frame(TimecodeUtils.frame_to_timedelta(1, item_fps), timeline_fps), 1)
 
@@ -70,17 +72,31 @@ class Resolve:
 
         timeline = self.get_current_timeline()
         timeline_fps = timeline.get_frame_rate()
-        convert_from_timeline_fps = lambda frame, fps: TimecodeUtils.timedelta_to_frame(TimecodeUtils.frame_to_timedelta(frame, timeline_fps), fps)
 
         resolve_clip_infos = []
 
         for insert_info in insert_infos:
-            item_fps = insert_info.media_pool_item._item.GetClipProperty()["FPS"]
+            item_fps = insert_info.media_pool_item.get_frame_rate()
+            mark_in_out = insert_info.media_pool_item._item.GetMarkInOut()
+            mark_in = mark_in_out.get(insert_info.track_handle.type, {}).get("in")
+            mark_out = mark_in_out.get(insert_info.track_handle.type, {}).get("out")
+
+            source_start_frame = insert_info.source_start_frame
+            source_frames = TimecodeUtils.frame_to_frame(insert_info.frames or insert_info.end_frame - insert_info.start_frame, timeline_fps, item_fps)
+
+            if mark_in is not None:
+                source_start_frame = max(source_start_frame, mark_in)
+
+            if mark_out is not None:
+                source_frames = min(source_frames, mark_out)
+
+            if not MediaPoolItemType.support_extending_duration(insert_info.media_pool_item.get_type()):
+                source_frames = min(source_frames, insert_info.media_pool_item.get_duration())
 
             resolve_clip_info = {
                 "mediaPoolItem": insert_info.media_pool_item._item,
-                "startFrame": 0,
-                "endFrame": convert_from_timeline_fps(insert_info.frames or insert_info.end_frame - insert_info.start_frame, item_fps),
+                "startFrame": source_start_frame,
+                "endFrame": source_start_frame + source_frames,
                 "recordFrame": insert_info.start_frame,
             }
 
