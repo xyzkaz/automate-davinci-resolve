@@ -18,7 +18,7 @@ from .smart_edit_bin import SmartEditBin
 from .replica_textplus import ReplicaTextPlus
 from .ui.loading_window import LoadingWindow
 from ..utils.math import FrameRange
-from .constants import GeneratedTrackName, EffectType
+from .constants import GeneratedTrackName, EffectType, EFFECT_TRACK_MAP
 
 
 class KeywordMatcher:
@@ -87,7 +87,7 @@ class EffectSelector:
 
     @classmethod
     def _get_item_type(cls, item: MediaPoolItem):
-        item_type = item.get_type()
+        item_type = item.get_clip_type()
         support_keyword = MediaPoolItemType.support_keyword(item_type)
 
         if item_type == MediaPoolItemType.FUSION_TITLE:
@@ -258,14 +258,9 @@ class EffectControl:
 
     @classmethod
     def _get_or_add_generated_tracks(cls, timeline: Timeline) -> dict[EffectType, TrackHandle | None]:
-        track_name_map = {
-            EffectType.VISUAL_EFFECT: ("video", GeneratedTrackName.VISUAL_EFFECT),
-            EffectType.SOUND_EFFECT: ("audio", GeneratedTrackName.SOUND_EFFECT),
-        }
-
         tracks = {}
 
-        for effect_type, (track_type, track_name) in track_name_map.items():
+        for effect_type, (track_type, track_name) in EFFECT_TRACK_MAP.items():
             track_handle = timeline.find_track_by_name(track_type, track_name)
 
             if track_handle is None:

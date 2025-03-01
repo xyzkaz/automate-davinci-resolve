@@ -90,7 +90,7 @@ class Resolve:
             if mark_out is not None:
                 source_frames = min(source_frames, mark_out)
 
-            if not MediaPoolItemType.support_extending_duration(insert_info.media_pool_item.get_type()):
+            if not MediaPoolItemType.support_extending_duration(insert_info.media_pool_item.get_clip_type()):
                 source_frames = min(source_frames, insert_info.media_pool_item.get_duration())
 
             resolve_clip_info = {

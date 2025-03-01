@@ -1,6 +1,15 @@
 from enum import Enum
 
 
+class EffectType(Enum):
+    TEXT_STYLE = 0
+    # TEXT_VISUAL_EFFECT =
+    VISUAL_EFFECT = 1
+    SOUND_EFFECT = 2
+    TRANSITION = 3
+    BACKGROUND_MUSIC = 4
+
+
 class GeneratedTrackName:
     EFFECT_CONTROL = "Generated Control"
     TEXT = "Generated Text+"
@@ -8,10 +17,7 @@ class GeneratedTrackName:
     SOUND_EFFECT = "Generated SE"
 
 
-class EffectType(Enum):
-    TEXT_STYLE = 0
-    TEXT_VISUAL_EFFECT = 1
-    VISUAL_EFFECT = 2
-    SOUND_EFFECT = 3
-    TRANSITION = 4
-    BACKGROUND_MUSIC = 5
+EFFECT_TRACK_MAP = {
+    EffectType.VISUAL_EFFECT: ("video", GeneratedTrackName.VISUAL_EFFECT),
+    EffectType.SOUND_EFFECT: ("audio", GeneratedTrackName.SOUND_EFFECT),
+}

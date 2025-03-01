@@ -9,7 +9,7 @@ class MediaPoolItem:
     def get_clip_name(self) -> str:
         return self._item.GetClipProperty("Clip Name")
 
-    def get_type(self) -> str:
+    def get_clip_type(self) -> str:
         return self._item.GetClipProperty("Type")
 
     def get_frame_rate(self) -> float:
