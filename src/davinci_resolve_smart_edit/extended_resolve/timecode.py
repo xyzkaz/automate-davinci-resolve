@@ -14,6 +14,13 @@ class TimecodeUtils:
         return int((dt.hour * 3600 + dt.minute * 60 + dt.second) * frame_rate + frame)
 
     @staticmethod
+    def str_to_timedelta(timecode: str, frame_rate: float) -> int:
+        dt = datetime.strptime(timecode[:-3], "%H:%M:%S")
+        frame = int(timecode[-2:])
+
+        return timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second + frame / frame_rate)
+
+    @staticmethod
     def frame_to_timedelta(frame: int, frame_rate: float) -> timedelta:
         total_seconds, remain_frames = divmod(frame, frame_rate)
         hours, remain_seconds = divmod(total_seconds, 3600)
@@ -31,6 +38,10 @@ class TimecodeUtils:
         t = time(hour=int(hours), minute=int(minutes), second=int(remain_seconds))
 
         return f"{t.strftime('%H:%M:%S')}:{remain_frames:02.0f}"
+
+    @classmethod
+    def frame_to_frame(cls, frame: int, from_frame_rate: float, to_frame_rate: float):
+        return frame * to_frame_rate / from_frame_rate
 
 
 class TimecodeSettings:

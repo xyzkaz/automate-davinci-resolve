@@ -16,33 +16,12 @@ from ..extended_resolve.track import TrackHandle
 from .errors import UserError
 from .smart_edit_bin import SmartEditBin
 from .ui.loading_window import LoadingWindow
-
-
-@dataclass
-class FrameRange:
-    start: int
-    end: int
-
-    @classmethod
-    def is_overlapped(cls, range1: "FrameRange", range2: "FrameRange"):
-        return range1.start < range2.end and range1.end > range2.start
-
-    @classmethod
-    def is_highly_overlapped(cls, range1: "FrameRange", range2: "FrameRange"):
-        overlapped_range = FrameRange(max(range1.start, range2.start), min(range1.end, range2.end))
-        overlapped_duration = overlapped_range.end - overlapped_range.start
-        range1_duration = range1.end - range1.start
-        range2_duration = range2.end - range2.start
-
-        if (overlapped_duration / range1_duration >= 0.5) or (overlapped_duration / range2_duration >= 0.5):
-            return True
-
-        return False
+from ..utils.math import FrameRange
+from .constants import GeneratedTrackName
 
 
 class ReplicaTextPlus:
     SMART_EDIT_CLIP_ID = "ReplicaTextPlus"
-    TRACK_NAME = "Generated Text+"
 
     @classmethod
     def generate_textplus_clips(cls, auto_snap: bool):
@@ -57,7 +36,7 @@ class ReplicaTextPlus:
         subtitle_timeline_items = list(timeline.iter_items_in_track(active_subtitle_track_handle))
         subtitle_ranges = cls._compute_subtitle_insert_ranges(timeline, subtitle_timeline_items, auto_snap)
 
-        track_handle = timeline.get_or_add_track_by_name("video", cls.TRACK_NAME)
+        track_handle = timeline.get_or_add_track_by_name("video", GeneratedTrackName.TEXT)
 
         with timeline.rollback_playhead_on_exit():
             old_items = list(timeline.iter_items_in_track(track_handle))
@@ -91,12 +70,7 @@ class ReplicaTextPlus:
         dst_timeline_items = list(timeline.iter_items(lambda item: cls._is_replicate_textplus_clip(item), track_type="video"))
 
         LoadingWindow.set_message(f"Copying Style to {len(dst_timeline_items)} clips...")
-
-        with (
-            timeline.rollback_playhead_on_exit(),
-            resolve.temp_timeline_item(source_item) as src_timeline_item,
-        ):
-            cls._copy_style(src_timeline_item, dst_timeline_items)
+        cls.copy_style_for_clips(dst_timeline_items, source_item)
 
     @classmethod
     def copy_style_for_track(cls, track_handle: TrackHandle, source_item: MediaPoolItem):
@@ -105,15 +79,14 @@ class ReplicaTextPlus:
         dst_timeline_items = list(timeline.iter_items_in_track(track_handle, lambda item: cls._is_replicate_textplus_clip(item)))
 
         LoadingWindow.set_message(f"Copying Style to {len(dst_timeline_items)} clips at track {track_handle.get_short_name()}...")
-
-        with (
-            timeline.rollback_playhead_on_exit(),
-            resolve.temp_timeline_item(source_item) as src_timeline_item,
-        ):
-            cls._copy_style(src_timeline_item, dst_timeline_items)
+        cls.copy_style_for_clips(dst_timeline_items, source_item)
 
     @classmethod
     def copy_style_for_clip(cls, destinated_item: TimelineItem, source_item: MediaPoolItem):
+        cls.copy_style_for_clips([destinated_item], source_item)
+
+    @classmethod
+    def copy_style_for_clips(cls, destinated_items: list[TimelineItem], source_item: MediaPoolItem):
         resolve = davinci_resolve_module.get_resolve()
         timeline = resolve.get_current_timeline()
 
@@ -121,7 +94,7 @@ class ReplicaTextPlus:
             timeline.rollback_playhead_on_exit(),
             resolve.temp_timeline_item(source_item) as src_timeline_item,
         ):
-            cls._copy_style(src_timeline_item, [destinated_item])
+            cls._copy_style(src_timeline_item, destinated_items)
 
     @classmethod
     def export_srt_for_track(cls, track_handle: TrackHandle, file_path: Path):
@@ -278,7 +251,7 @@ class ReplicaTextPlus:
             associable_ranges = [
                 to_range
                 for to_range in itertools.takewhile(lambda to_range: FrameRange.is_overlapped(from_range, to_range), to_ranges)
-                if FrameRange.is_highly_overlapped(from_range, to_range)
+                if FrameRange.is_overlapped_by_percentage(from_range, to_range)
             ]
 
             if len(associable_ranges) > 0:

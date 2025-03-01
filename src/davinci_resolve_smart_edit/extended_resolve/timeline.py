@@ -97,6 +97,10 @@ class Timeline:
 
         return track_handle
 
+    def clear_track(self, track_handle: TrackHandle):
+        items = list(self.iter_items_in_track(track_handle))
+        self.delete_items(items)
+
     def get_track_enabled(self, track_handle: TrackHandle):
         return self._timeline.GetIsTrackEnabled(track_handle.type, track_handle.index)
 
