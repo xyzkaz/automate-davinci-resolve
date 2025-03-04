@@ -1,10 +1,12 @@
 from ..resolve_types import PyRemoteMediaPoolItem
 from .timecode import TimecodeUtils
+from .folder import Folder
 
 
 class MediaPoolItem:
-    def __init__(self, _item: PyRemoteMediaPoolItem):
+    def __init__(self, _item: PyRemoteMediaPoolItem, folder: Folder | None = None):
         self._item = _item
+        self.folder = folder
 
     def get_clip_name(self) -> str:
         return self._item.GetClipProperty("Clip Name")

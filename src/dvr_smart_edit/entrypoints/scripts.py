@@ -1,16 +1,16 @@
 from ..extended_resolve import davinci_resolve_module
 from ..smart_edit.effect_control import EffectControl
-from ..smart_edit.replica_textplus import ReplicaTextPlus
+from ..smart_edit.uni_textplus import UniTextPlus
 from ..smart_edit.ui.loading_window import LoadingWindow
 
 
 def on_generate_textplus_clips(auto_snap: bool):
-    with LoadingWindow("ReplicaText+", "Generating clips..."):
-        ReplicaTextPlus.generate_textplus_clips(auto_snap)
+    with LoadingWindow("UniText+", "Generating clips..."):
+        UniTextPlus.generate_textplus_clips(auto_snap)
 
 
 def on_generate_effect_control_clips():
-    with LoadingWindow("Effect Control", "Generating clips..."):
+    with LoadingWindow("EffectControl", "Generating clips..."):
         EffectControl.generate_effect_control_clips()
 
 
@@ -60,8 +60,8 @@ def smart_edit_menu():
                     ui.Button(
                         {
                             "ID": "GenerateEffectControlClips",
-                            "Text": "Generate Effect Control Clips",
-                            "ToolTip": "Generate Effect Control clips according to `Generated Text+` track.\nOverwrite `Generated Control` track if already exist.",
+                            "Text": "Generate EffectControl Clips",
+                            "ToolTip": "Generate EffectControl clips according to `Generated Text+` track.\nOverwrite `Generated Control` track if already exist.",
                             "Geometry": [0, 0, 30, 50],
                             "Weight": 0.0,
                         }

@@ -15,7 +15,7 @@ from ..extended_resolve.timecode import TimecodeUtils
 from ..extended_resolve.constants import MediaPoolItemType
 from .errors import UserError
 from .smart_edit_bin import SmartEditBin
-from .replica_textplus import ReplicaTextPlus
+from .uni_textplus import UniTextPlus
 from .ui.loading_window import LoadingWindow
 from ..utils.math import FrameRange
 from .constants import GeneratedTrackName, EffectType, EFFECT_TRACK_MAP
@@ -91,7 +91,10 @@ class EffectSelector:
         support_keyword = MediaPoolItemType.support_keyword(item_type)
 
         if item_type == MediaPoolItemType.FUSION_TITLE:
-            return EffectType.TEXT_STYLE, support_keyword
+            if "text_animation" in item.folder.folder_path.get_names():
+                return EffectType.TEXT_ANIMATION, support_keyword
+            else:
+                return EffectType.TEXT_STYLE, support_keyword
         elif item_type == MediaPoolItemType.AUDIO:
             duration = item.get_duration_as_timedelta()
 
@@ -100,7 +103,13 @@ class EffectSelector:
             else:
                 return EffectType.BACKGROUND_MUSIC, support_keyword
         else:
-            return EffectType.VISUAL_EFFECT, support_keyword
+            folder_names = item.folder.folder_path.get_names()
+            if "visual_adjust" in folder_names:
+                return EffectType.VISUAL_ADJUST, support_keyword
+            elif "camera_adjust" in folder_names:
+                return EffectType.CAMERA_ADJUST, support_keyword
+            else:
+                return EffectType.VISUAL_OVERLAY, support_keyword
 
 
 class EffectControl:
@@ -202,7 +211,7 @@ class EffectControl:
                 frame_ranges=[item.get_frame_range() for item in effect_control_items],
             )
 
-            LoadingWindow.set_message(f"Selecting effects for {len(effect_control_items)} Effect Control clips...")
+            LoadingWindow.set_message(f"Selecting effects for {len(effect_control_items)} EffectControl clips...")
             all_selected_effects = [effect_selector.select(cls._get_keywords(item)) for item in effect_control_items]
 
             LoadingWindow.set_message(f"Copying Text+ style...")
@@ -213,7 +222,12 @@ class EffectControl:
             for item, selected_effects in zip(effect_control_items, all_selected_effects):
                 frame_range = item.get_frame_range()
 
-                for effect_type in [EffectType.VISUAL_EFFECT, EffectType.SOUND_EFFECT]:
+                for effect_type in [
+                    EffectType.VISUAL_OVERLAY,
+                    EffectType.VISUAL_ADJUST,
+                    EffectType.CAMERA_ADJUST,
+                    EffectType.SOUND_EFFECT,
+                ]:
                     track_handle = generated_tracks.get(effect_type)
                     media_pool_item = selected_effects.get(effect_type)
                     if track_handle is not None and media_pool_item is not None:
@@ -226,8 +240,9 @@ class EffectControl:
                             )
                         )
 
-            LoadingWindow.set_message(f"Inserting {len(insert_infos)} effect clips...")
-            resolve.insert_to_timeline(insert_infos)
+            if insert_infos:
+                LoadingWindow.set_message(f"Inserting {len(insert_infos)} effect clips...")
+                resolve.insert_to_timeline(insert_infos)
 
     @classmethod
     def _apply_text_styles(cls, timeline: Timeline, effect_control_items: list[TimelineItem], all_selected_effects: list[SelectedEffects]):
@@ -243,7 +258,7 @@ class EffectControl:
                 textplus_map[key]["destinated_items"].extend(dst_items)
 
         for map in textplus_map.values():
-            ReplicaTextPlus.copy_style_for_clips(map["destinated_items"], map["media_pool_item"])
+            UniTextPlus.copy_style_for_clips(map["destinated_items"], map["media_pool_item"])
 
     @classmethod
     def toggle_keyword(cls, destinated_item: TimelineItem, keyword: str):
@@ -260,14 +275,22 @@ class EffectControl:
     def _get_or_add_generated_tracks(cls, timeline: Timeline) -> dict[EffectType, TrackHandle | None]:
         tracks = {}
 
+        at_video_track_handle = timeline.find_track_by_name("video", GeneratedTrackName.TEXT)
+
         for effect_type, (track_type, track_name) in EFFECT_TRACK_MAP.items():
             track_handle = timeline.find_track_by_name(track_type, track_name)
 
             if track_handle is None:
-                track_handle = timeline.get_or_add_track_by_name(track_type, track_name)
+                if track_type == "video" and at_video_track_handle is not None:
+                    track_handle = timeline.get_or_add_track_by_name(track_type, track_name, at_video_track_handle.index)
+                else:
+                    track_handle = timeline.get_or_add_track_by_name(track_type, track_name)
 
                 if track_handle is not None:
                     timeline.set_track_locked(track_handle, True)
+
+            if track_type == "video":
+                at_video_track_handle = TrackHandle("video", min(at_video_track_handle.index, track_handle.index))
 
             tracks[effect_type] = track_handle
 

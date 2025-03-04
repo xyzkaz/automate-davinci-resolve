@@ -14,6 +14,9 @@ class FolderPath:
     def bottom(self):
         return self._folders[-1]
 
+    def get_names(self):
+        return [_folder.GetName() for _folder in self._folders]
+
 
 class Folder:
     def __init__(self, folder_path: FolderPath):
@@ -28,7 +31,7 @@ class Folder:
 
     def iter_items(self, condition=lambda _: True):
         for _item in self._folder.GetClipList():
-            item = MediaPoolItem(_item)
+            item = MediaPoolItem(_item, folder=self)
 
             if condition(item):
                 yield item

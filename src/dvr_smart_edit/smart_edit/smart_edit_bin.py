@@ -7,16 +7,16 @@ from ..extended_resolve.media_pool import MediaPool
 
 
 class SmartEditBin:
-    BIN_PATH = files("davinci_resolve_smart_edit.data").joinpath("smart_edit.drb")
+    BIN_PATH = files("dvr_smart_edit.data").joinpath("smart_edit.drb")
     FOLDER_NAME = "Smart Edit"
 
     class ClipName(Enum):
-        REPLICA_TEXTPLUS = "ReplicaText+"
-        EFFECT_CONTROL = "Effect Control"
+        UNI_TEXTPLUS = "UniText+"
+        EFFECT_CONTROL = "EffectControl"
 
     @classmethod
-    def get_or_import_replica_textplus(cls):
-        return cls._get_or_import_clip(cls.ClipName.REPLICA_TEXTPLUS)
+    def get_or_import_uni_textplus(cls):
+        return cls._get_or_import_clip(cls.ClipName.UNI_TEXTPLUS)
 
     @classmethod
     def get_or_import_effect_control(cls):

@@ -27,9 +27,9 @@ class ModuleUtils:
 
     @classmethod
     def reload_module(cls):
-        import davinci_resolve_smart_edit
+        import dvr_smart_edit
 
-        module = davinci_resolve_smart_edit
+        module = dvr_smart_edit
 
         visited_modules = set()
         return cls._recursive_reload(module, module.__package__, visited_modules)

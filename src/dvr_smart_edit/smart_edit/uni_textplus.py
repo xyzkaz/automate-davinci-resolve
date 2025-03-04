@@ -23,14 +23,14 @@ from .constants import GeneratedTrackName
 LineRange = tuple[int, int]
 
 
-class ReplicaTextPlus:
-    SMART_EDIT_CLIP_ID = "ReplicaTextPlus"
+class UniTextPlus:
+    SMART_EDIT_CLIP_ID = "UniTextPlus"
 
     @classmethod
     def generate_textplus_clips(cls, auto_snap: bool):
         resolve = davinci_resolve_module.get_resolve()
         timeline = resolve.get_current_timeline()
-        media_pool_item = SmartEditBin.get_or_import_replica_textplus()
+        media_pool_item = SmartEditBin.get_or_import_uni_textplus()
         active_subtitle_track_handle = next((e for e in timeline.iter_tracks("subtitle") if timeline.get_track_enabled(e)), None)
 
         if active_subtitle_track_handle is None:
@@ -70,7 +70,7 @@ class ReplicaTextPlus:
     def copy_style_for_all(cls, source_item: MediaPoolItem):
         resolve = davinci_resolve_module.get_resolve()
         timeline = resolve.get_current_timeline()
-        dst_timeline_items = list(timeline.iter_items(lambda item: cls._is_replicate_textplus_clip(item), track_type="video"))
+        dst_timeline_items = list(timeline.iter_items(lambda item: cls._is_uni_textplus_clip(item), track_type="video"))
 
         LoadingWindow.set_message(f"Copying Style to {len(dst_timeline_items)} clips...")
         cls.copy_style_for_clips(dst_timeline_items, source_item)
@@ -79,7 +79,7 @@ class ReplicaTextPlus:
     def copy_style_for_track(cls, track_handle: TrackHandle, source_item: MediaPoolItem):
         resolve = davinci_resolve_module.get_resolve()
         timeline = resolve.get_current_timeline()
-        dst_timeline_items = list(timeline.iter_items_in_track(track_handle, lambda item: cls._is_replicate_textplus_clip(item)))
+        dst_timeline_items = list(timeline.iter_items_in_track(track_handle, lambda item: cls._is_uni_textplus_clip(item)))
 
         LoadingWindow.set_message(f"Copying Style to {len(dst_timeline_items)} clips at track {track_handle.get_short_name()}...")
         cls.copy_style_for_clips(dst_timeline_items, source_item)
@@ -106,7 +106,7 @@ class ReplicaTextPlus:
 
         LoadingWindow.set_message(f"Collecting subtitle content...")
 
-        subtitle_timeline_items = timeline.iter_items_in_track(track_handle, lambda item: cls._is_replicate_textplus_clip(item))
+        subtitle_timeline_items = timeline.iter_items_in_track(track_handle, lambda item: cls._is_uni_textplus_clip(item))
         subtitles = cls._transform_to_subtitles(timeline, subtitle_timeline_items)
 
         LoadingWindow.set_message(f"Exporting {len(subtitles)} subtitles to file `{file_path}` ...")
@@ -138,9 +138,9 @@ class ReplicaTextPlus:
         LoadingWindow.set_message(f"Deleting {len(old_items)} clips...")
         timeline.delete_items(old_items)
 
-        media_pool_item = SmartEditBin.get_or_import_replica_textplus()
+        media_pool_item = SmartEditBin.get_or_import_uni_textplus()
         if media_pool_item is None:
-            raise Exception(f"Failed to import clip `{SmartEditBin.ClipName.REPLICA_TEXTPLUS}`")
+            raise Exception(f"Failed to import clip `{SmartEditBin.ClipName.UNI_TEXTPLUS}`")
 
         LoadingWindow.set_message(f"Inserting {len(subtitles)} clips...")
         insert_infos = [
@@ -157,7 +157,7 @@ class ReplicaTextPlus:
         LoadingWindow.set_message(f"Setting {len(subtitles)} clips content...")
         for i, item in enumerate(inserted_items):
             if item is None:
-                raise UserError(f"Failed to insert clip `{SmartEditBin.ClipName.REPLICA_TEXTPLUS}` with info {insert_infos[i]}")
+                raise UserError(f"Failed to insert clip `{SmartEditBin.ClipName.UNI_TEXTPLUS}` with info {insert_infos[i]}")
 
             tool = item._item.GetFusionCompByIndex(1).Template
             tool.SetInput("StyledText", subtitles[i].content)
@@ -181,7 +181,7 @@ class ReplicaTextPlus:
         return subtitles
 
     @classmethod
-    def _is_replicate_textplus_clip(cls, item: TimelineItem):
+    def _is_uni_textplus_clip(cls, item: TimelineItem):
         if item._item.GetFusionCompCount() == 0:
             return False
 
@@ -227,7 +227,7 @@ class ReplicaTextPlus:
     @classmethod
     def _map_style_array_to_lines(cls, style_array: dict, text: str):
         line_ranges: list[LineRange] = sorted({(value[2], value[3]) for value in style_array.values()})
-        new_line_ranges = cls._get_line_ranges(text, max_line_count=len(line_ranges))
+        new_line_ranges = cls._get_line_ranges(text, max_line_count=len(line_ranges) + 1)
         new_style_array = {}
 
         for i, value in list(style_array.items()):
