@@ -1,4 +1,4 @@
-from davinci_resolve_smart_edit.smart_edit.replica_textplus import ReplicaTextPlus
+from dvr_smart_edit.smart_edit.uni_textplus import UniTextPlus
 
 
 class TestSnapRanges:

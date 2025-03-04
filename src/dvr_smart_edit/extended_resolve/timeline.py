@@ -84,13 +84,13 @@ class Timeline:
         else:
             return TrackHandle(track_type, self._timeline.GetTrackCount(track_type))
 
-    def get_or_add_track_by_name(self, track_type: str, track_name):
+    def get_or_add_track_by_name(self, track_type: str, track_name: str, track_index: int = None):
         track_handle = self.find_track_by_name(track_type, track_name)
 
         if track_handle is not None:
             return track_handle
 
-        track_handle = self.add_track(track_type)
+        track_handle = self.add_track(track_type, track_index)
 
         if track_handle is not None:
             self._timeline.SetTrackName(track_handle.type, track_handle.index, track_name)

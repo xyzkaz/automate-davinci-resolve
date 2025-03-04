@@ -1,5 +1,5 @@
 [project]
-name = "davinci_resolve_smart_edit"
+name = "dvr_smart_edit"
 description = "Davinci Resolve plugin to automate editing"
 readme = "README.md"
 authors = [{name = "xyzjoey"}]

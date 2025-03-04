@@ -17,7 +17,7 @@
 			ViewInfo = OperatorInfo { Pos = { 220, 49.5 } },
 			UserControls = ordered() {
 				ForAllNest = {
-					LINKS_Name = "For all Effect Control",
+					LINKS_Name = "For all EffectControl",
 					LINKID_DataType = "Number",
 					INPID_InputControl = "LabelControl",
 					INP_Default = 1,
@@ -36,7 +36,7 @@
 				ReloadForAll = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_reload_for_all()",
+					BTNCS_Execute = "!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_reload_for_all()",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -47,7 +47,7 @@
 				ApplyEffectForALl = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_apply_effect_for_all()",
+					BTNCS_Execute = "!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_apply_effect_for_all()",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -75,7 +75,7 @@
 				Reload = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_reload_for_clip(comp)",
+					BTNCS_Execute = "!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_reload_for_clip(comp)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -86,7 +86,7 @@
 				ApplyEffect = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_apply_effect_for_clip(comp)",
+					BTNCS_Execute = "!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_apply_effect_for_clip(comp)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -236,7 +236,7 @@
 				KeywordToggle1 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword1'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword1'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -248,7 +248,7 @@
 				KeywordToggle2 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword2'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword2'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -260,7 +260,7 @@
 				KeywordToggle3 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword3'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword3'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -272,7 +272,7 @@
 				KeywordToggle4 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword4'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword4'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -284,7 +284,7 @@
 				KeywordToggle5 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword5'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword5'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -296,7 +296,7 @@
 				KeywordToggle6 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword6'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword6'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -308,7 +308,7 @@
 				KeywordToggle7 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword7'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword7'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -320,7 +320,7 @@
 				KeywordToggle8 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword8'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword8'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -332,7 +332,7 @@
 				KeywordToggle9 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword9'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword9'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -344,7 +344,7 @@
 				KeywordToggle10 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword10'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword10'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -356,7 +356,7 @@
 				KeywordToggle11 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword11'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword11'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -368,7 +368,7 @@
 				KeywordToggle12 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword12'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword12'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -380,7 +380,7 @@
 				KeywordToggle13 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword13'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword13'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -392,7 +392,7 @@
 				KeywordToggle14 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword14'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword14'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -404,7 +404,7 @@
 				KeywordToggle15 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword15'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword15'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -416,7 +416,7 @@
 				KeywordToggle16 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword16'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword16'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -428,7 +428,7 @@
 				KeywordToggle17 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword17'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword17'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -440,7 +440,7 @@
 				KeywordToggle18 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword18'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword18'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -452,7 +452,7 @@
 				KeywordToggle19 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword19'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword19'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",
@@ -464,7 +464,7 @@
 				KeywordToggle20 = {
 					INP_Integer = false,
 					INPID_InputControl = "ButtonControl",
-					BTNCS_Execute = "!Py: keyword_name = 'Keyword20'; from davinci_resolve_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from davinci_resolve_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
+					BTNCS_Execute = "!Py: keyword_name = 'Keyword20'; from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import effect_control_clip; effect_control_clip.on_toggle_keyword(comp, keyword_name)",
 					INP_SplineType = "Default",
 					INP_External = false,
 					LINKID_DataType = "Number",

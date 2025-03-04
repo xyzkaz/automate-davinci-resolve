@@ -7,7 +7,7 @@ from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..extended_resolve.constants import MediaPoolItemType
 from ..resolve_types import PyRemoteComposition
 from ..smart_edit.errors import UserError
-from ..smart_edit.replica_textplus import ReplicaTextPlus
+from ..smart_edit.uni_textplus import UniTextPlus
 from ..smart_edit.ui.loading_window import LoadingWindow
 from .script_utils import ScriptUtils
 
@@ -17,7 +17,7 @@ def _is_textplus_item(item: MediaPoolItem):
 
 
 def on_copy_style_for_all():  # TODO: preserve style on regeneration
-    with LoadingWindow("ReplicaText+", "Copying Style..."):
+    with LoadingWindow("UniText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
         media_pool_item = media_pool.find_selected_item(_is_textplus_item)
@@ -25,11 +25,11 @@ def on_copy_style_for_all():  # TODO: preserve style on regeneration
         if media_pool_item is None:
             raise UserError("No Media Pool Text+ clip selected")
 
-        ReplicaTextPlus.copy_style_for_all(media_pool_item)
+        UniTextPlus.copy_style_for_all(media_pool_item)
 
 
 def on_copy_style_for_track(composition: PyRemoteComposition):
-    with LoadingWindow("ReplicaText+", "Copying Style..."):
+    with LoadingWindow("UniText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
         media_pool_item = media_pool.find_selected_item(_is_textplus_item)
@@ -38,11 +38,11 @@ def on_copy_style_for_track(composition: PyRemoteComposition):
             raise UserError("No Media Pool Text+ clip selected")
 
         timeline_item = ScriptUtils.get_timeline_item_from_composition(composition)
-        ReplicaTextPlus.copy_style_for_track(timeline_item.get_track_handle(), media_pool_item)
+        UniTextPlus.copy_style_for_track(timeline_item.get_track_handle(), media_pool_item)
 
 
 def on_copy_style_for_clip(composition: PyRemoteComposition):
-    with LoadingWindow("ReplicaText+", "Copying Style..."):
+    with LoadingWindow("UniText+", "Copying Style..."):
         resolve = davinci_resolve_module.get_resolve()
         media_pool = resolve.get_media_pool()
         media_pool_item = media_pool.find_selected_item(_is_textplus_item)
@@ -51,7 +51,7 @@ def on_copy_style_for_clip(composition: PyRemoteComposition):
             raise UserError("No Media Pool Text+ clip selected")
 
         timeline_item = ScriptUtils.get_timeline_item_from_composition(composition)
-        ReplicaTextPlus.copy_style_for_clip(timeline_item, media_pool_item)
+        UniTextPlus.copy_style_for_clip(timeline_item, media_pool_item)
 
 
 def on_export_srt_for_track(composition: PyRemoteComposition):
@@ -66,9 +66,9 @@ def on_export_srt_for_track(composition: PyRemoteComposition):
     if not file_path:
         return
 
-    with LoadingWindow("ReplicaText+", "Exporting Srt..."):
+    with LoadingWindow("UniText+", "Exporting Srt..."):
         timeline_item = ScriptUtils.get_timeline_item_from_composition(composition)
-        ReplicaTextPlus.export_srt_for_track(timeline_item.get_track_handle(), Path(file_path))
+        UniTextPlus.export_srt_for_track(timeline_item.get_track_handle(), Path(file_path))
 
 
 def on_import_srt_for_track(composition: PyRemoteComposition):  # TODO: preserve style
@@ -83,6 +83,6 @@ def on_import_srt_for_track(composition: PyRemoteComposition):  # TODO: preserve
     if not file_path:
         return
 
-    with LoadingWindow("ReplicaText+", "Importing Srt..."):
+    with LoadingWindow("UniText+", "Importing Srt..."):
         timeline_item = ScriptUtils.get_timeline_item_from_composition(composition)
-        ReplicaTextPlus.import_srt_for_track(timeline_item, Path(file_path))
+        UniTextPlus.import_srt_for_track(timeline_item, Path(file_path))
