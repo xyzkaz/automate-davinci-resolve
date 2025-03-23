@@ -1,6 +1,11 @@
 from enum import Enum
 
 
+class SnapMode(Enum):
+    NONE = 0
+    AUDIO = 1
+
+
 class EffectType(Enum):
     TEXT_ANIMATION = 0
     TEXT_STYLE = 1

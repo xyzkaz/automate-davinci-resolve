@@ -23,7 +23,10 @@ class ModuleUtils:
                 dependant_module = sys.modules[attr.__module__]
                 cls._recursive_reload(dependant_module, root_package_name, visited_modules)
 
-        return importlib.reload(module)
+        try:
+            return importlib.reload(module)
+        except:
+            return None
 
     @classmethod
     def reload_module(cls):

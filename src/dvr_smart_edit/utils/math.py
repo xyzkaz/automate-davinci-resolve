@@ -23,5 +23,5 @@ class FrameRange:
         return False
 
     @classmethod
-    def is_started_in_range(cls, range1: int, range2: "FrameRange"):
+    def is_started_in_range(cls, range1: "FrameRange", range2: "FrameRange"):
         return range2.start <= range1.start and range1.start < range2.end

@@ -59,7 +59,7 @@ class LoadingWindow(ContextDecorator):
             self.ui_dispatcher._ui_dispatcher.RunLoop()
         else:
             traceback.print_exc()
-            self._set_message(f"Unexpected error occurred. Check console for details.")
+            self._set_message(f"Unexpected error. Check console for details.")
             self.ui_dispatcher._ui_dispatcher.RunLoop()
 
         self.instances.remove(self)
@@ -73,6 +73,8 @@ class LoadingWindow(ContextDecorator):
         self.ui_dispatcher._ui_dispatcher.StepLoop()
 
     @classmethod
-    def set_message(cls, message: str):
-        log.info(f"{cls.instances[-1].title} - {message}")
+    def set_message(cls, message: str, dispatch_log: bool = True):
+        if dispatch_log:
+            log.info(f"{cls.instances[-1].title} - {message}")
+
         cls.instances[-1]._set_message(message)

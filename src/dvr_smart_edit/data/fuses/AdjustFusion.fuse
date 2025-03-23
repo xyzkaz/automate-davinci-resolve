@@ -1,0 +1,145 @@
+FuRegisterClass("AdjustFusion", CT_Tool, {
+	REGS_Name             = "AdjustFusion",
+	REGS_Category         = "SmartEdit",
+	REGS_OpIconString     = "SeAf",
+	REGS_OpDescription    = "",
+	REG_OpNoMask          = true,
+	REG_NoBlendCtrls      = true,
+	REG_NoObjMatCtrls     = true,
+	REG_NoMotionBlurCtrls = true,
+	-- REG_Fuse_NoEdit       = true,
+	-- REG_Fuse_NoReload     = true,
+	REG_Fuse_NoEdit       = false,
+	REG_Fuse_NoReload     = false,
+	-- REG_Version        = 1,
+})
+
+function Create()
+	self:BeginControlNest("Copy Targets for Underneath Tracks", "CopyLabel", true, {});
+
+	InReload = self:AddInput("This Clip", "Copy", {
+		LINKID_DataType    = "Number",
+		INPID_InputControl = "ButtonControl",
+		BTNCS_Execute      =
+		"!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import adjust_fusion_clip; adjust_fusion_clip.on_copy_for_clip(comp)",
+		ICD_Width          = 0.5,
+		INP_External       = false,
+		INP_Passive        = true,
+	})
+
+	InReloadForAll = self:AddInput("All AdjustFusion", "CopyForAll", {
+		LINKID_DataType    = "Number",
+		INPID_InputControl = "ButtonControl",
+		-- BTNCS_Execute      =
+		-- "!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import adjust_fusion_clip; adjust_fusion_clip.on_copy_for_all()",
+		ICD_Width          = 0.5,
+		INP_External       = false,
+		INP_Passive        = true,
+	})
+
+	InTrackNum = self:AddInput("#Tracks Underneath", "NumberOfTracks", {
+		LINKID_DataType = "Number",
+		INPID_InputControl = "SliderControl",
+		INP_Integer = true,
+		INP_MinScale = 1,
+		INP_MaxScale = 10,
+		INP_Default = 1,
+	})
+
+	self:EndControlNest()
+
+	self:BeginControlNest("Targets", "TargetLabel", true, {});
+
+	InSourceInputs = self:AddInput("Source Inputs", "SourceInputs", {
+		LINKID_DataType        = "Text",
+		INPID_InputControl     = "TextEditControl",
+		TEC_Lines              = 10,
+		-- INP_DoNotifyChanged = true,
+		INP_External           = false,
+		INP_InteractivePassive = true,
+	})
+
+	InTargetTools = self:AddInput("Target Tools", "TargetTools", {
+		LINKID_DataType        = "Text",
+		INPID_InputControl     = "TextEditControl",
+		TEC_Lines              = 5,
+		-- INP_DoNotifyChanged = true,
+		INP_External           = false,
+		INP_InteractivePassive = true,
+	})
+
+	InAddSourceInput = self:AddInput("Add Target Input", "AddSourceInput", {
+		LINKID_DataType     = "Text",
+		INPID_InputControl  = "TextEditControl",
+		TEC_Lines           = 1,
+		INP_DoNotifyChanged = true,
+		INP_External        = true,
+		INP_Passive         = true,
+	})
+
+	self:EndControlNest()
+
+	-- self:RemoveControlPage("Controls")
+	-- self:AddControlPage("UniText+")
+
+	-- InFitToTextArea = self:AddInput("Fit To TextArea", "FitToTextArea", {
+	-- 	LINKID_DataType        = "Number",
+	-- 	INPID_InputControl     = "CheckboxControl",
+	-- 	INP_Default            = 1.0,
+	-- 	INP_DoNotifyChanged    = true,
+	-- 	INP_External           = false,
+	-- 	INP_InteractivePassive = true,
+	-- })
+
+	-- self:EndControlNest()
+
+	-- InTextPlus = self:AddInput("Text+", "TextPlus", {
+	-- 	LINKID_DataType = "Image",
+	-- 	LINK_Main       = 1,
+	-- })
+
+	-- InDataWindowRef = self:AddInput("DataWindowReference", "DataWindowReference", {
+	-- 	LINKID_DataType = "Image",
+	-- 	LINK_Main       = 2,
+	-- })
+
+	-- InTextArea = self:AddInput("TextArea", "TextArea", {
+	-- 	LINKID_DataType = "Image",
+	-- 	LINK_Main       = 3,
+	-- })
+
+	OutImage = self:AddOutput("Output", "Output", {
+		LINKID_DataType = "Image",
+		LINK_Main       = 1,
+	})
+end
+
+function NotifyChanged(inp, param, time)
+	if inp ~= nil and param ~= nil then
+		if inp == InAddSourceInput then
+			self:GetComp():Execute(
+				"!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import adjust_fusion_clip; adjust_fusion_clip.on_add_source_input(comp, '" ..
+				self.Name .. "')")
+		end
+		-- if inp == InFitToTextArea then
+		-- 	if param.Value == 1.0 then
+		-- 		self:GetComp():Execute(
+		-- 			"!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import uni_textplus_clip; uni_textplus_clip.on_enable_fit_to_textarea(comp, '" ..
+		-- 			self.Name .. "')")
+		-- 	else
+		-- 		self:GetComp():Execute(
+		-- 			"!Py: from dvr_smart_edit.entrypoints import setup_module; setup_module(bmd, resolve, fusion); from dvr_smart_edit.entrypoints import uni_textplus_clip; uni_textplus_clip.on_disable_fit_to_textarea(comp, '" ..
+		-- 			self.Name .. "')")
+		-- 	end
+		-- end
+	end
+end
+
+function Process(req)
+	p = Pixel({ R = 0, G = 0, B = 0, A = 0 })
+
+	out = Image({})
+	out:Fill(p)
+
+	OutImage:Set(req, out)
+end
