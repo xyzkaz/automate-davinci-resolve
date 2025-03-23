@@ -1,24 +1,24 @@
-from dataclasses import dataclass
 import itertools
-from collections import defaultdict
-from datetime import timedelta
 import re
+from collections import defaultdict
+from dataclasses import dataclass
+from datetime import timedelta
 
 from ..extended_resolve import davinci_resolve_module
+from ..extended_resolve.constants import MediaPoolItemType
 from ..extended_resolve.media_pool import MediaPool
 from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..extended_resolve.resolve import MediaPoolItemInsertInfo
+from ..extended_resolve.timecode import TimecodeUtils
 from ..extended_resolve.timeline import Timeline
 from ..extended_resolve.timeline_item import TimelineItem
 from ..extended_resolve.track import TrackHandle
-from ..extended_resolve.timecode import TimecodeUtils
-from ..extended_resolve.constants import MediaPoolItemType
+from ..utils.math import FrameRange
+from .constants import EFFECT_TRACK_MAP, EffectType, GeneratedTrackName
 from .errors import UserError
 from .smart_edit_bin import SmartEditBin
-from .uni_textplus import UniTextPlus
 from .ui.loading_window import LoadingWindow
-from ..utils.math import FrameRange
-from .constants import GeneratedTrackName, EffectType, EFFECT_TRACK_MAP
+from .uni_textplus import UniTextPlus
 
 
 class KeywordMatcher:
@@ -113,8 +113,6 @@ class EffectSelector:
 
 
 class EffectControl:
-    SMART_EDIT_CLIP_ID = "EffectControl"
-
     @classmethod
     def generate_effect_control_clips(cls):
         resolve = davinci_resolve_module.get_resolve()
@@ -164,7 +162,7 @@ class EffectControl:
 
         dst_items = list(timeline.iter_items(lambda item: cls._is_effect_control_clip(item), track_type="video"))
 
-        cls._reinsert_clips(timeline, dst_items, media_pool_item)
+        cls._reinsert_effect_control_clips(timeline, dst_items, media_pool_item)
 
     @classmethod
     def reload_clip(cls, destinated_item: TimelineItem):
@@ -175,7 +173,7 @@ class EffectControl:
         if media_pool_item is None:
             raise Exception(f"Failed to import clip `{SmartEditBin.ClipName.EFFECT_CONTROL}`")
 
-        cls._reinsert_clips(timeline, [destinated_item], media_pool_item)
+        cls._reinsert_effect_control_clips(timeline, [destinated_item], media_pool_item)
 
     @classmethod
     def apply_effect_for_all(cls):
@@ -259,17 +257,6 @@ class EffectControl:
 
         for map in textplus_map.values():
             UniTextPlus.copy_style_for_clips(map["destinated_items"], map["media_pool_item"])
-
-    @classmethod
-    def toggle_keyword(cls, destinated_item: TimelineItem, keyword: str):
-        keywords = cls._get_keywords(destinated_item)
-
-        if keyword in keywords:
-            keywords.remove(keyword)
-        else:
-            keywords.append(keyword)
-
-        cls._set_keywords(destinated_item, keywords)
 
     @classmethod
     def _get_or_add_generated_tracks(cls, timeline: Timeline) -> dict[EffectType, TrackHandle | None]:
@@ -386,14 +373,15 @@ class EffectControl:
             return False
 
         comp = item._item.GetFusionCompByIndex(1)
+        tool = comp.Template
 
-        if comp.Template is None:
+        if tool is None:
             return False
 
-        return comp.Template.GetData("SmartEdit.ClipId") == cls.SMART_EDIT_CLIP_ID
+        return tool.ID == "Fuse.EffectControl"
 
     @classmethod
-    def _reinsert_clips(cls, timeline: Timeline, effect_control_items: list[TimelineItem], effect_control_media_pool_item: MediaPoolItem):
+    def _reinsert_effect_control_clips(cls, timeline: Timeline, effect_control_items: list[TimelineItem], effect_control_media_pool_item: MediaPoolItem):
         resolve = davinci_resolve_module.get_resolve()
         all_keywords = [cls._get_keywords(item) for item in effect_control_items]
         insert_infos = [
@@ -430,7 +418,7 @@ class EffectControl:
         return keywords
 
     @classmethod
-    def _set_keywords(cls, effect_control_item: TimelineItem, keywords: list[str]):  # TODO: unset unselected keywords
+    def _set_keywords(cls, effect_control_item: TimelineItem, keywords: list[str]):
         comp = effect_control_item._item.GetFusionCompByIndex(1)
         tool = comp.Template
 

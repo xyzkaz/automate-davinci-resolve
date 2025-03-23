@@ -1,5 +1,4 @@
 import itertools
-import traceback
 from pathlib import Path
 from typing import Iterable
 
@@ -8,26 +7,66 @@ import srt
 from ..extended_resolve import davinci_resolve_module
 from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..extended_resolve.resolve import MediaPoolItemInsertInfo
+from ..extended_resolve.textplus import TextPlusSettings
 from ..extended_resolve.timecode import Timecode
 from ..extended_resolve.timeline import Timeline
 from ..extended_resolve.timeline_item import TimelineItem
 from ..extended_resolve.track import TrackHandle
-from ..extended_resolve.textplus import TextPlusSettings
+from ..resolve_types import PyRemoteOperator
+from ..utils.math import FrameRange
+from .constants import GeneratedTrackName, SnapMode
 from .errors import UserError
 from .smart_edit_bin import SmartEditBin
 from .ui.loading_window import LoadingWindow
-from ..utils.math import FrameRange
-from .constants import GeneratedTrackName
-
 
 LineRange = tuple[int, int]
 
 
-class UniTextPlus:
-    SMART_EDIT_CLIP_ID = "UniTextPlus"
+class UniTextPlusControl:
+    @classmethod
+    def enable_fit_to_textarea(cls, uni_control_tool: PyRemoteOperator):
+        out1 = uni_control_tool.TextPlus.GetConnectedOutput()
+        textplus = out1.GetTool() if out1 is not None else None
+
+        out2 = uni_control_tool.DataWindowReference.GetConnectedOutput()
+        dod_ref = out2.GetTool() if out2 is not None else None
+
+        out3 = uni_control_tool.TextArea.GetConnectedOutput()
+        textarea = out3.GetTool() if out3 is not None else None
+
+        if textplus is None or dod_ref is None or textarea is None:
+            return
+
+        textarea_width = f"({textplus.Name}.Width * {textarea.Name}.Width)"
+        textarea_height = f"({textplus.Name}.Height * {textarea.Name}.Height)"
+        dod_width = f"({dod_ref.Name}.Output.DataWindow[3] - {dod_ref.Name}.Output.DataWindow[1])"
+        dod_height = f"({dod_ref.Name}.Output.DataWindow[4] - {dod_ref.Name}.Output.DataWindow[2])"
+
+        if textplus.LayoutSize.GetExpression() is None:
+            uni_control_tool.SetInput("SavedLayoutSize", textplus.GetInput("LayoutSize"))
+        if textplus.LineSizeX.GetExpression() is None:
+            uni_control_tool.SetInput("SavedLineSizeX", textplus.GetInput("LineSizeX"))
+
+        textplus.LayoutSize.SetExpression(f"iif({dod_height} ~= 0, {textarea_height} / {dod_height}, 1.0)")
+        textplus.LineSizeX.SetExpression(f"iif({dod_width} ~= 0, min(1.0, {textarea_width} * {dod_height} / ({dod_width} * {textarea_height})), 1.0)")
 
     @classmethod
-    def generate_textplus_clips(cls, auto_snap: bool):
+    def disable_fit_to_textarea(cls, uni_control_tool: PyRemoteOperator):
+        out1 = uni_control_tool.TextPlus.GetConnectedOutput()
+        textplus = out1.GetTool() if out1 is not None else None
+
+        if textplus is None:
+            return
+
+        textplus.LayoutSize.SetExpression()
+        textplus.LineSizeX.SetExpression()
+        textplus.SetInput("LayoutSize", uni_control_tool.GetInput("SavedLayoutSize"))
+        textplus.SetInput("LineSizeX", uni_control_tool.GetInput("SavedLineSizeX"))
+
+
+class UniTextPlus:
+    @classmethod
+    def generate_textplus_clips(cls, snap_mode: SnapMode):
         resolve = davinci_resolve_module.get_resolve()
         timeline = resolve.get_current_timeline()
         media_pool_item = SmartEditBin.get_or_import_uni_textplus()
@@ -37,7 +76,7 @@ class UniTextPlus:
             raise UserError("Failed to find enabled subtitle track")
 
         subtitle_timeline_items = list(timeline.iter_items_in_track(active_subtitle_track_handle))
-        subtitle_ranges = cls._compute_subtitle_insert_ranges(timeline, subtitle_timeline_items, auto_snap)
+        subtitle_ranges = cls._compute_subtitle_insert_ranges(timeline, subtitle_timeline_items, snap_mode)
 
         track_handle = timeline.get_or_add_track_by_name("video", GeneratedTrackName.TEXT)
 
@@ -123,7 +162,6 @@ class UniTextPlus:
         try:
             subtitles = list(srt.parse(file_content))
         except:
-            traceback.print_exc()
             raise UserError(f"Failed to parse srt file `{file_path}`. See console for details.")
 
         resolve = davinci_resolve_module.get_resolve()
@@ -181,7 +219,7 @@ class UniTextPlus:
         return subtitles
 
     @classmethod
-    def _is_uni_textplus_clip(cls, item: TimelineItem):
+    def _is_textplus_clip(cls, item: TimelineItem):
         if item._item.GetFusionCompCount() == 0:
             return False
 
@@ -190,7 +228,19 @@ class UniTextPlus:
         if comp.Template is None:
             return False
 
-        return comp.Template.GetData("SmartEdit.ClipId") == cls.SMART_EDIT_CLIP_ID
+        return comp.Template.GetAttrs("TOOLS_RegID") == "TextPlus"
+
+    @classmethod
+    def _is_uni_textplus_clip(cls, item: TimelineItem):
+        if item._item.GetFusionCompCount() == 0:
+            return False
+
+        comp = item._item.GetFusionCompByIndex(1)
+
+        if comp.UniText is None:
+            return False
+
+        return True
 
     @classmethod
     def _copy_style(cls, src_item: TimelineItem, dst_items: Iterable[TimelineItem]):
@@ -204,7 +254,9 @@ class UniTextPlus:
     def _copy_style_from_settings(cls, src_settings: dict, dst_items: Iterable[TimelineItem]):
         new_settings = TextPlusSettings(src_settings)
 
-        for dst_item in dst_items:
+        for i, dst_item in enumerate(dst_items):
+            LoadingWindow.set_message(f"Setting {i + 1}/{len(dst_items)} Text+ content...", dispatch_log=False)
+
             dst_comp = dst_item._item.GetFusionCompByIndex(1)
             dst_tool = dst_comp.Template
             old_settings = TextPlusSettings(dst_comp.CopySettings(dst_tool))
@@ -215,7 +267,6 @@ class UniTextPlus:
 
             new_settings.get_text_input()._settings["Value"] = new_text
             new_tool_settings._settings["Inputs"]["GlobalOut"] = old_tool_settings._settings["Inputs"]["GlobalOut"]
-            new_tool_settings._settings["CustomData"] = old_tool_settings._settings["CustomData"]
 
             character_level_settings = new_settings.find_character_level_styling()
             if character_level_settings is not None:
@@ -223,6 +274,14 @@ class UniTextPlus:
                 character_level_settings.style_array = new_style_array
 
             dst_tool.LoadSettings(new_settings._settings)
+
+            uni_control_tool = dst_comp.UniTextControl
+
+            if uni_control_tool is not None:
+                fit = uni_control_tool.GetInput("FitToTextArea")
+
+                if fit:
+                    UniTextPlusControl.enable_fit_to_textarea(uni_control_tool)
 
     @classmethod
     def _map_style_array_to_lines(cls, style_array: dict, text: str):
@@ -273,10 +332,10 @@ class UniTextPlus:
             return textplus_tool["Inputs"]["StyledText"]
 
     @classmethod
-    def _compute_subtitle_insert_ranges(cls, timeline: Timeline, subtitle_timeline_items: list[TimelineItem], auto_snap: bool):
+    def _compute_subtitle_insert_ranges(cls, timeline: Timeline, subtitle_timeline_items: list[TimelineItem], snap_mode: SnapMode):
         subtitle_ranges = [FrameRange(item._item.GetStart(), item._item.GetEnd()) for item in subtitle_timeline_items]
 
-        if not subtitle_ranges or not auto_snap:
+        if not subtitle_ranges or snap_mode == SnapMode.NONE:
             return subtitle_ranges
 
         snap_target_track_handle = cls._get_audio_track_with_most_clips(timeline)

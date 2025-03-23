@@ -7,12 +7,17 @@ from ..extended_resolve.media_pool import MediaPool
 
 
 class SmartEditBin:
-    BIN_PATH = files("dvr_smart_edit.data").joinpath("smart_edit.drb")
-    FOLDER_NAME = "Smart Edit"
+    BIN_PATH = files("dvr_smart_edit.data").joinpath("bins/smart_edit.drb")
+    FOLDER_NAME = "SmartEdit"
 
     class ClipName(Enum):
         UNI_TEXTPLUS = "UniText+"
         EFFECT_CONTROL = "EffectControl"
+
+    @classmethod
+    def import_bin(cls):
+        media_pool = davinci_resolve_module.get_resolve().get_media_pool()
+        cls._get_or_import_bin(media_pool)
 
     @classmethod
     def get_or_import_uni_textplus(cls):

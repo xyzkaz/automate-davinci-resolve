@@ -1,10 +1,11 @@
+from typing import Optional
+
 from ..resolve_types import PyRemoteMediaPoolItem
 from .timecode import TimecodeUtils
-from .folder import Folder
 
 
 class MediaPoolItem:
-    def __init__(self, _item: PyRemoteMediaPoolItem, folder: Folder | None = None):
+    def __init__(self, _item: PyRemoteMediaPoolItem, folder: Optional["Folder"] = None):
         self._item = _item
         self.folder = folder
 

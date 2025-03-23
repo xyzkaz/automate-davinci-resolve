@@ -1,4 +1,4 @@
-from typing import Iterable, Generator
+from typing import Generator, Iterable
 
 from ..extended_resolve.media_pool_item import MediaPoolItem
 from ..resolve_types import PyRemoteFolder
@@ -14,7 +14,7 @@ class MediaPool:
 
     def import_bin(self, file_path, parent_folder: Folder):
         self._media_pool.SetCurrentFolder(parent_folder._folder)
-        return self._media_pool.ImportFolderFromFile(str(file_path), "")
+        return self._media_pool.ImportFolderFromFile(str(file_path))
 
     def get_root_folder(self):
         return Folder(folder_path=FolderPath([self._media_pool.GetRootFolder()]))
