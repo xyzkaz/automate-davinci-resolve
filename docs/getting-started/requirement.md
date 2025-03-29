@@ -1,0 +1,2 @@
+- davinci resolve (studio?) version
+- python version
