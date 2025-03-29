@@ -2,6 +2,9 @@
   {
     "version": "pr-27",
     "title": "pr-27",
-    "aliases": []
+    "aliases": [],
+    "properties": {
+      "hidden": true
+    }
   }
 ]
